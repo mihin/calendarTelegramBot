@@ -4,6 +4,7 @@
 import logging
 import environs
 import openai
+from openai import OpenAI
 import datetime
 import json
 from datetime import datetime, timedelta
@@ -77,8 +78,12 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     # await update.message.reply_text(update.message.text)
-    print(update.message)
-    response = reply(update.message.text)
+    if update.message and update.message.forward_origin:
+        forwarded_text = update.message.text
+        response = f"It was forwarded message: {forwarded_text}" # + f"{update.message.forward_origin}"
+    #print(update.message)
+    else:
+        response = f"direct message: {update.message.text}"  # reply(update.message.text)
     await context.bot.send_message(chat_id=update.effective_chat.id, text=response)
 
 
@@ -96,7 +101,7 @@ async def echoFwd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 def main() -> None:
     # Set up OpenAI API key
     openai.api_key = openai_token
-
+  #  openai.base_url = "https://api.proxyapi.ru/openai/v1"
 
     """Start the bot."""
     # Create the Application and pass it your bot's token.
